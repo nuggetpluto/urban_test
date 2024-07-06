@@ -9,7 +9,10 @@
 #         return x * y
 #
 #     def divide(x, y):
-#         return x / y if y != 0 else float('inf')
+#         try:
+#             return x / y
+#         except ZeroDivisionError:
+#             return 'нельзя делить на ноль!'
 #
 #     if operation == 'add':
 #         return add
@@ -22,6 +25,14 @@
 #     else:
 #         return None
 #
+#
+# add_func = function_factory('add')
+# print(add_func(2, 3))
+#
+#
+# divide_func = function_factory('divide')
+# print(divide_func(4, 0))
+# print(divide_func(4, 2))
 #
 # add_func = function_factory('add')
 # print(add_func(2, 3))
