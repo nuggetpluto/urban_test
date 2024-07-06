@@ -4,7 +4,7 @@ second = 'Рамена мало было'
 
 comparison_result = list(map(lambda x, y: x == y, first, second))
 print(comparison_result)
-
+#
 
 # Замыкание
 def get_advanced_writer(file_name):
