@@ -44,3 +44,6 @@ if __name__ == "__main__":
     manager.run(requests)
 
     print(dict(manager.data))
+    
+
+
