@@ -1,8 +1,8 @@
 import unittest
-from runner_and_tournament import Runner, Tournament  # Импортируем классы из файла
+from runner_and_tournament import Runner, Tournament
 
 class RunnerTest(unittest.TestCase):
-    is_frozen = False  # Атрибут для заморозки тестов
+    is_frozen = False
 
     def setUp(self):
         self.runner = Runner("TestRunner", 5)
