@@ -6,7 +6,7 @@ class TestRunner(unittest.TestCase):
         runner = Runner('Иван')
         for _ in range(10):
             runner.walk()
-            self.assertEqual(runner.distance, 50)
+        self.assertEqual(runner.distance, 50)
 
     def test_runner_run(self):
         runner = Runner('Иван(run)')
@@ -20,7 +20,8 @@ class TestRunner(unittest.TestCase):
         for i in range(10):
             runner1.run()
             runner2.walk()
-        self.assertEqual(runner1.distance, runner2.distance)
+        self.assertNotEqual(runner1.distance, runner2.distance)
+
 
 if __name__ == '__main__':
     unittest.main()

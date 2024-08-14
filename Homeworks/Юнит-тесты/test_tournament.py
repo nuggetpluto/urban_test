@@ -1,22 +1,57 @@
 import unittest
-from runner_and_tournament import Runner, Tournament
+from runner_and_tournament import Runner, Tournament  # Импортируем классы из файла
+
+class RunnerTest(unittest.TestCase):
+    is_frozen = False  # Атрибут для заморозки тестов
+
+    def setUp(self):
+        self.runner = Runner("TestRunner", 5)
+
+    def test_walk(self):
+        if self.__class__.is_frozen:
+            self.skipTest('Тесты в этом кейсе заморожены')
+        for _ in range(10):
+            self.runner.walk()
+        self.assertEqual(self.runner.distance, 50)
+
+    def test_run(self):
+        if self.__class__.is_frozen:
+            self.skipTest('Тесты в этом кейсе заморожены')
+        for _ in range(10):
+            self.runner.run()
+        self.assertEqual(self.runner.distance, 100)
+
+    def test_challenge(self):
+        if self.__class__.is_frozen:
+            self.skipTest('Тесты в этом кейсе заморожены')
+        runner1 = Runner("Runner1", 5)
+        runner2 = Runner("Runner2", 7)
+        for _ in range(10):
+            runner1.run()
+            runner2.walk()
+        self.assertNotEqual(runner1.distance, runner2.distance)
 
 
 class TournamentTest(unittest.TestCase):
+    is_frozen = True  # Атрибут для заморозки тестов
 
     @classmethod
     def setUpClass(cls):
         cls.all_results = {}
+
     def setUp(self):
+        if self.__class__.is_frozen:
+            self.skipTest('Тесты в этом кейсе заморожены')
         self.usain = Runner("Usain", 10)
         self.andrey = Runner("Andrey", 9)
         self.nick = Runner("Nick", 3)
 
     @classmethod
     def tearDownClass(cls):
-        for key, result in cls.all_results.items():
-            formatted_result = {place: runner.name for place, runner in result.items()}
-            print(formatted_result)
+        if not cls.is_frozen:
+            for key, result in cls.all_results.items():
+                formatted_result = {place: runner.name for place, runner in result.items()}
+                print(formatted_result)
 
     def test_usain_vs_nick(self):
         tournament = Tournament(90, self.usain, self.nick)
@@ -35,7 +70,3 @@ class TournamentTest(unittest.TestCase):
         results = tournament.start()
         self.__class__.all_results["Usain, Andrey vs Nick"] = results
         self.assertTrue(results[max(results.keys())].name == "Nick")
-
-
-if __name__ == '__main__':
-    unittest.main()
