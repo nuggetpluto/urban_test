@@ -6,7 +6,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
 
-TOKEN = '7222268649:AAH48XPDF8yYUqbPvg5rDYBtrW8ci1tvqHw'
+TOKEN = '********************************'
 
 # Инициализация бота и диспетчера с хранением состояний в памяти
 bot = Bot(token=TOKEN)
