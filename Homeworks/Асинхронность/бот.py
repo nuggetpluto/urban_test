@@ -5,7 +5,7 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
-# Токен вашего бота
+
 TOKEN = '********************************'
 
 # Инициализация бота и диспетчера с хранением состояний в памяти
