@@ -1,11 +1,11 @@
 from aiogram import Bot, Dispatcher, types
 from aiogram.utils import executor
-from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message, CallbackQuery
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
-
+# Токен вашего бота
 TOKEN = '********************************'
 
 # Инициализация бота и диспетчера с хранением состояний в памяти
@@ -14,26 +14,45 @@ storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 
 # Определение группы состояний
+
 class UserState(StatesGroup):
     age = State()
     growth = State()
     weight = State()
 
-# Создание клавиатуры с кнопками "Рассчитать" и "Информация"
-keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-button_calculate = KeyboardButton('Рассчитать')
-button_info = KeyboardButton('Информация')
+# Обычная клавиатура с кнопками "Рассчитать" и "Информация"
+keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+button_calculate = types.KeyboardButton('Рассчитать')
+button_info = types.KeyboardButton('Информация')
 keyboard.add(button_calculate, button_info)
+
+# Inline-клавиатура с кнопками "Рассчитать норму калорий" и "Формулы расчёта"
+inline_keyboard = InlineKeyboardMarkup(row_width=2)
+inline_calories = InlineKeyboardButton(text="Рассчитать норму калорий", callback_data="calories")
+inline_formulas = InlineKeyboardButton(text="Формулы расчёта", callback_data="formulas")
+inline_keyboard.add(inline_calories, inline_formulas)
 
 # Обработка команды /start
 @dp.message_handler(commands=['start'])
 async def start(message: Message):
     await message.answer('Привет! Я бот, помогающий твоему здоровью. Выберите действие:', reply_markup=keyboard)
 
-# Функция для ввода возраста, реагирующая на нажатие кнопки "Рассчитать"
+# Функция для вывода Inline-клавиатуры
 @dp.message_handler(text='Рассчитать')
-async def set_age(message: Message):
-    await message.answer('Введите свой возраст:')
+async def main_menu(message: Message):
+    await message.answer('Выберите опцию:', reply_markup=inline_keyboard)
+
+# Обработка нажатия на кнопку "Формулы расчёта"
+@dp.callback_query_handler(text='formulas')
+async def get_formulas(call: CallbackQuery):
+    formula = ("Формула Миффлина-Сан Жеора для мужчин: BMR = 10 * вес + 6.25 * рост - 5 * возраст + 5\n"
+               "Формула Миффлина-Сан Жеора для женщин: BMR = 10 * вес + 6.25 * рост - 5 * возраст - 161")
+    await call.message.answer(formula)
+
+# Функция для ввода возраста (начало машины состояний), при нажатии на "Рассчитать норму калорий"
+@dp.callback_query_handler(text='calories')
+async def set_age(call: CallbackQuery):
+    await call.message.answer('Введите свой возраст:')
     await UserState.age.set()
 
 # Функция для ввода роста после возраста
@@ -56,7 +75,7 @@ async def send_calories(message: Message, state: FSMContext):
     await state.update_data(weight=int(message.text))
     data = await state.get_data()
 
-    # Пример расчета по формуле Миффлина - Сан Жеора для мужчин
+    # Пример расчета по формуле Миффлина-Сан Жеора для мужчин
     age = data['age']
     growth = data['growth']
     weight = data['weight']
