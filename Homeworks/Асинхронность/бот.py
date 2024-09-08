@@ -5,8 +5,7 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
-
-TOKEN = '********************************'
+TOKEN = '**********************************************************************'
 
 # Инициализация бота и диспетчера с хранением состояний в памяти
 bot = Bot(token=TOKEN)
@@ -14,7 +13,6 @@ storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 
 # Определение группы состояний
-
 class UserState(StatesGroup):
     age = State()
     growth = State()
@@ -24,23 +22,77 @@ class UserState(StatesGroup):
 keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
 button_calculate = types.KeyboardButton('Рассчитать')
 button_info = types.KeyboardButton('Информация')
-keyboard.add(button_calculate, button_info)
+button_buy = types.KeyboardButton('Купить')  # Добавляем кнопку "Купить"
+keyboard.add(button_calculate, button_info, button_buy)
 
-# Inline-клавиатура с кнопками "Рассчитать норму калорий" и "Формулы расчёта"
-inline_keyboard = InlineKeyboardMarkup(row_width=2)
+# Inline-клавиатура с продуктами
+buy_menu = InlineKeyboardMarkup(row_width=2)
+inline_product1 = InlineKeyboardButton(text="Product1", callback_data="product1")
+inline_product2 = InlineKeyboardButton(text="Product2", callback_data="product2")
+inline_product3 = InlineKeyboardButton(text="Product3", callback_data="product3")
+inline_product4 = InlineKeyboardButton(text="Product4", callback_data="product4")
+buy_menu.add(inline_product1, inline_product2, inline_product3, inline_product4)
+
+# Inline-клавиатура для расчета калорий
+calories_menu = InlineKeyboardMarkup(row_width=1)
 inline_calories = InlineKeyboardButton(text="Рассчитать норму калорий", callback_data="calories")
 inline_formulas = InlineKeyboardButton(text="Формулы расчёта", callback_data="formulas")
-inline_keyboard.add(inline_calories, inline_formulas)
+calories_menu.add(inline_calories, inline_formulas)
 
 # Обработка команды /start
 @dp.message_handler(commands=['start'])
 async def start(message: Message):
-    await message.answer('Привет! Я бот, помогающий твоему здоровью. Выберите действие:', reply_markup=keyboard)
+    await message.answer(f'Привет, {message.from_user.first_name}! Я бот, помогающий твоему здоровью. Выберите действие:', reply_markup=keyboard)
 
-# Функция для вывода Inline-клавиатуры
+# Функция для вывода Inline-клавиатуры с продуктами
+@dp.message_handler(text='Купить')
+@dp.message_handler(text='Купить')
+async def get_buying_list(message: Message):
+    # Отправляем информацию о каждом товаре с фотографиями
+    products_info = [
+        ("Product1", "Описание 1", 100, 'photos/photo1.jpg'),
+        ("Product2", "Описание 2", 200, 'photos/photo2.jpg'),
+        ("Product3", "Описание 3", 300, 'photos/photo3.jpg'),
+        ("Product4", "Описание 4", 400, 'photos/photo4.jpg')
+    ]
+
+    for product_name, description, price, photo_path in products_info:
+        caption = f"{product_name} - {description}\nЦена: {price} руб."
+        await message.answer_photo(photo=open(photo_path, 'rb'), caption=caption)
+
+    # Отправляем кнопки для выбора товара
+    await message.answer('Выберите продукт для покупки:', reply_markup=buy_menu)
+
+
+# Функция для вывода Inline-клавиатуры с калькулятором калорий
 @dp.message_handler(text='Рассчитать')
 async def main_menu(message: Message):
-    await message.answer('Выберите опцию:', reply_markup=inline_keyboard)
+    await message.answer('Выберите опцию для расчета калорий:', reply_markup=calories_menu)
+
+# Обработчики для каждого продукта
+@dp.callback_query_handler(text='product1')
+async def buy_product1(call: CallbackQuery):
+    await call.message.answer_photo(photo=open('photos/photo1.jpg', 'rb'))
+    await call.message.answer("Вы успешно приобрели Product1!")
+    await call.answer()
+
+@dp.callback_query_handler(text='product2')
+async def buy_product2(call: CallbackQuery):
+    await call.message.answer_photo(photo=open('photos/photo2.jpg', 'rb'))
+    await call.message.answer("Вы успешно приобрели Product2!")
+    await call.answer()
+
+@dp.callback_query_handler(text='product3')
+async def buy_product3(call: CallbackQuery):
+    await call.message.answer_photo(photo=open('photos/photo3.jpg', 'rb'))
+    await call.message.answer("Вы успешно приобрели Product3!")
+    await call.answer()
+
+@dp.callback_query_handler(text='product4')
+async def buy_product4(call: CallbackQuery):
+    await call.message.answer_photo(photo=open('photos/photo4.jpg', 'rb'))
+    await call.message.answer("Вы успешно приобрели Product4!")
+    await call.answer()
 
 # Обработка нажатия на кнопку "Формулы расчёта"
 @dp.callback_query_handler(text='formulas')
